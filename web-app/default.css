@@ -1,0 +1,429 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Circuit Conquest – stylesheet
+   Approach A for unavailable cells: aria-disabled="true" keeps cells
+   focusable so keyboard users can explore the whole board.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Custom properties ──────────────────────────────────────────────────── */
+:root {
+    /* Player One: blue family */
+    --c-p1:       #1055a8;
+    --c-p1-light: #dce9fb;
+    --c-p1-dark:  #0d3f7a;
+
+    /* Player Two: orange family */
+    --c-p2:       #b84000;
+    --c-p2-light: #faeae0;
+    --c-p2-dark:  #8a3000;
+
+    /* Neutrals */
+    --c-bg:          #ffffff;
+    --c-surface:     #f5f6f7;
+    --c-border:      #c8cdd4;
+    --c-text:        #1a1a1a;
+    --c-text-muted:  #595f6a;
+    --c-cell-empty:  #eef0f2;
+    --c-cell-hover:  #d8dce2;
+
+    /* Focus ring – high-contrast black with yellow fill matches
+       both light and dark cell backgrounds */
+    --c-focus:     #000000;
+    --c-focus-bg:  #ffdd00;
+
+    /* Restart button */
+    --c-restart:       #1a5c00;
+    --c-restart-hover: #124200;
+    --c-restart-text:  #ffffff;
+
+    /* Board geometry */
+    --board-size:   min(90vw, 30rem);  /* square board; caps at 480 px */
+    --board-gap:    3px;
+    --board-border: 5px;               /* coloured edge strips */
+    --cell-radius:  3px;
+}
+
+/* ─── Box sizing reset ────────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--c-text);
+    background-color: var(--c-bg);
+}
+
+/* ─── Visually-hidden utility (accessible but invisible) ─────────────────── */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ─── Site header ─────────────────────────────────────────────────────────── */
+.site-header {
+    background-color: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+    padding: 0.875rem 1rem;
+    text-align: center;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    letter-spacing: -0.01em;
+}
+
+.site-tagline {
+    margin: 0.2rem 0 0;
+    font-size: 0.9rem;
+    color: var(--c-text-muted);
+}
+
+/* ─── Main layout ─────────────────────────────────────────────────────────── */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1rem 2rem;
+    max-width: 56rem;
+    margin: 0 auto;
+}
+
+/* ─── Player cards ────────────────────────────────────────────────────────── */
+.players-section {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: var(--board-size);
+}
+
+.player-card {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 2px solid var(--c-border);
+    flex: 1;
+    min-width: 9rem;
+    background-color: var(--c-surface);
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+}
+
+.player-card--one { border-left: 4px solid var(--c-p1); }
+.player-card--two { border-left: 4px solid var(--c-p2); }
+
+/* Active player highlighted when it is their turn */
+.player-card--active.player-card--one {
+    border-color: var(--c-p1);
+    background-color: var(--c-p1-light);
+    color: var(--c-p1-dark);
+    box-shadow: 0 0 0 2px var(--c-p1);
+}
+
+.player-card--active.player-card--two {
+    border-color: var(--c-p2);
+    background-color: var(--c-p2-light);
+    color: var(--c-p2-dark);
+    box-shadow: 0 0 0 2px var(--c-p2);
+}
+
+/* Winner card gets bold border */
+.player-card--winner.player-card--one {
+    border-color: var(--c-p1);
+    background-color: var(--c-p1-light);
+    color: var(--c-p1-dark);
+    box-shadow: 0 0 0 3px var(--c-p1);
+}
+
+.player-card--winner.player-card--two {
+    border-color: var(--c-p2);
+    background-color: var(--c-p2-light);
+    color: var(--c-p2-dark);
+    box-shadow: 0 0 0 3px var(--c-p2);
+}
+
+.player-marker {
+    font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.player-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.player-name {
+    font-size: 0.9rem;
+}
+
+.player-objective {
+    font-size: 0.78rem;
+    color: inherit;
+    opacity: 0.85;
+}
+
+/* ─── Game section ────────────────────────────────────────────────────────── */
+.game-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* ─── Status bar ──────────────────────────────────────────────────────────── */
+.status-bar {
+    width: 100%;
+    max-width: var(--board-size);
+    min-height: 2.2rem;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--c-border);
+    background-color: var(--c-surface);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ─── Board container ─────────────────────────────────────────────────────── */
+/*
+   Coloured borders indicate each player's target edges:
+   Blue  top & bottom  = Player One connects these (▲).
+   Orange left & right = Player Two connects these (■).
+   The gap background-color renders as grid lines between cells.
+*/
+.board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--board-gap);
+    background-color: var(--c-border);
+
+    width: var(--board-size);
+    aspect-ratio: 1;
+
+    border-top:    var(--board-border) solid var(--c-p1);
+    border-bottom: var(--board-border) solid var(--c-p1);
+    border-left:   var(--board-border) solid var(--c-p2);
+    border-right:  var(--board-border) solid var(--c-p2);
+}
+
+/* ─── Cell buttons ────────────────────────────────────────────────────────── */
+.cell {
+    /* Fill the grid cell completely */
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: none;
+    border-radius: var(--cell-radius);
+
+    background-color: var(--c-cell-empty);
+    color: var(--c-text);
+    cursor: pointer;
+
+    /* Centre the symbol */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    font-weight: bold;
+    line-height: 1;
+
+    /* Ensure clicking cannot accidentally select text */
+    user-select: none;
+    -webkit-user-select: none;
+
+    position: relative;
+}
+
+/* Hover only on cells where a move is currently legal */
+.cell:hover:not([aria-disabled="true"]) {
+    background-color: var(--c-cell-hover);
+}
+
+/* Focus indicator: inset ring so it does not disturb grid layout */
+.cell:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: -3px;
+    z-index: 1;
+    background-color: var(--c-focus-bg);
+    color: var(--c-text);
+}
+
+/* Player One occupied cell */
+.cell--one {
+    background-color: var(--c-p1-light);
+    color: var(--c-p1-dark);
+    cursor: default;
+}
+
+/* Player Two occupied cell */
+.cell--two {
+    background-color: var(--c-p2-light);
+    color: var(--c-p2-dark);
+    cursor: default;
+}
+
+/* Unavailable cell: keep same background but block hover and pointer.
+   Exclude :focus-visible so the focus ring is never dimmed. */
+.cell[aria-disabled="true"]:not(.cell--one):not(.cell--two):not(:focus-visible) {
+    cursor: default;
+    opacity: 0.55;
+}
+
+/* After the game is over, dim the losing player's cells slightly */
+.board--one-wins .cell--two {
+    opacity: 0.5;
+}
+
+.board--two-wins .cell--one {
+    opacity: 0.5;
+}
+
+/* ─── Restart button ──────────────────────────────────────────────────────── */
+.restart-button {
+    padding: 0.55rem 1.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: var(--c-restart);
+    color: var(--c-restart-text);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 10rem;
+}
+
+.restart-button:hover {
+    background-color: var(--c-restart-hover);
+}
+
+.restart-button:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: 3px;
+}
+
+/* ─── Instructions (collapsible) ──────────────────────────────────────────── */
+.instructions {
+    width: 100%;
+    max-width: var(--board-size);
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.instructions-summary {
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: var(--c-surface);
+    user-select: none;
+    -webkit-user-select: none;
+    list-style: none;   /* Firefox */
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Remove default disclosure triangle in WebKit/Blink */
+.instructions-summary::-webkit-details-marker { display: none; }
+
+/* Custom arrow */
+.instructions-summary::before {
+    content: "▶";
+    font-size: 0.65em;
+    transition: transform 0.15s;
+}
+
+details[open] > .instructions-summary::before {
+    transform: rotate(90deg);
+}
+
+.instructions-summary:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: -3px;
+}
+
+.instructions-body {
+    padding: 0.875rem 1rem;
+    border-top: 1px solid var(--c-border);
+}
+
+.instructions-body h3 {
+    margin: 0.75rem 0 0.35rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--c-text-muted);
+}
+
+.instructions-body h3:first-child {
+    margin-top: 0;
+}
+
+.instructions-body ul {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+}
+
+.instructions-body ul:last-child {
+    margin-bottom: 0;
+}
+
+.instructions-body li {
+    margin-bottom: 0.3rem;
+}
+
+/* ─── Responsive: narrow screens (≤ 480 px) ──────────────────────────────── */
+@media (max-width: 480px) {
+    .players-section {
+        gap: 0.6rem;
+    }
+
+    .player-card {
+        min-width: 8rem;
+        padding: 0.45rem 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .player-marker {
+        font-size: 1.25rem;
+    }
+
+    .player-name {
+        font-size: 0.85rem;
+    }
+
+    .player-objective {
+        font-size: 0.75rem;
+    }
+
+    .status-bar {
+        font-size: 0.95rem;
+    }
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .player-card,
+    .instructions-summary::before {
+        transition: none;
+    }
+}

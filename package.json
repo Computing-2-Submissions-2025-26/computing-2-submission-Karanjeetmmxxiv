@@ -6,11 +6,16 @@
   "main": "web-app/Module.js",
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "test": "mocha",
+    "docs": "jsdoc -c jsdoc.json"
+  },
   "dependencies": {
     "ramda": "^0.32.0"
   },
   "devDependencies": {
     "docdash": "^2.0.2",
+    "jsdoc": "^4.0.5",
     "mocha": "^11.7.5"
   }
 }
