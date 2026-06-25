@@ -51,11 +51,23 @@ npm install
 
 The web application uses ES modules, so it must be served over HTTP rather than opened as a local file directly.
 
-**Option A — VS Code with Firefox (uses the supplied debug configuration):**
+**Option A — VS code local host:**
+
+In powershell
+
+```sh
+py -m http.server 8080 --directory web-app
+```
+then open
+```sh
+http://localhost:8080
+```
+
+**Option B — VS Code with Firefox (uses the supplied debug configuration):**
 
 Open the project in VS Code and start the **"Run Web App – Firefox"** configuration from the Run and Debug panel (`Ctrl+Shift+D`). This launches Firefox with the file-origin restriction relaxed, allowing ES modules to load from the filesystem.
 
-**Option B — any browser, using a temporary HTTP server:**
+**Option C — any browser, using a temporary HTTP server:**
 
 ```sh
 npx http-server web-app
